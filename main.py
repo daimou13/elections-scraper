@@ -13,10 +13,12 @@ def get_soup(url: str) -> BeautifulSoup:
 
     return BeautifulSoup(response.text, "html.parser")
 
+
 def get_municipality_cells(soup: BeautifulSoup) -> list:
     """Find and return table cells containing municipality codes."""
     municipality_cells = soup.find_all("td", class_="cislo")
     return municipality_cells
+
 
 def get_municipality_data(cell, base_url: str) -> tuple[str, str, str]:
     """Extract municipality code, name and detail page URL from a table row."""
@@ -31,6 +33,7 @@ def get_municipality_data(cell, base_url: str) -> tuple[str, str, str]:
 
     return code, name, municipality_url
 
+
 def get_municipalities(
     municipality_cells: list,
     base_url: str,
@@ -44,6 +47,7 @@ def get_municipalities(
 
     return municipalities
 
+
 def get_summary_data(soup: BeautifulSoup) -> tuple[str, str, str]:
     """Extract registered voters, issued envelopes and valid votes."""
     registered = soup.find("td", headers="sa2")
@@ -51,10 +55,11 @@ def get_summary_data(soup: BeautifulSoup) -> tuple[str, str, str]:
     valid = soup.find("td", headers="sa6")
 
     return (
-    "".join(registered.get_text(strip=True).split()),
-    "".join(envelopes.get_text(strip=True).split()),
-    "".join(valid.get_text(strip=True).split()),
+        "".join(registered.get_text(strip=True).split()),
+        "".join(envelopes.get_text(strip=True).split()),
+        "".join(valid.get_text(strip=True).split()),
     )
+
 
 def get_party_results(soup: BeautifulSoup) -> list:
     """Extract party names and their vote counts from a municipality page."""
@@ -73,10 +78,11 @@ def get_party_results(soup: BeautifulSoup) -> list:
 
     return party_results
 
+
 def get_municipality_result(
     code: str,
     name: str,
-    url: str
+    url: str,
 ) -> dict:
     """Build a complete election result dictionary for one municipality."""
     soup = get_soup(url)
@@ -97,6 +103,7 @@ def get_municipality_result(
 
     return result
 
+
 def get_all_results(municipalities: list) -> list:
     """Download and collect election results for all municipalities."""
     results = []
@@ -111,6 +118,7 @@ def get_all_results(municipalities: list) -> list:
 
     return results
 
+
 def save_to_csv(results: list[dict[str, str]], output_file: str) -> None:
     """Save election results to a CSV file."""
     if not results:
@@ -123,12 +131,14 @@ def save_to_csv(results: list[dict[str, str]], output_file: str) -> None:
         writer.writeheader()
         writer.writerows(results)
 
+
 def is_valid_url(url: str) -> bool:
     """Check whether the URL points to a valid 2017 election district page."""
     return (
         url.startswith("https://volby.gov.cz/pls/ps2017nss/ps32")
         or url.startswith("https://volby.cz/pls/ps2017nss/ps32")
     )
+
 
 def main() -> None:
     """Validate arguments, scrape election results and save them to CSV."""
@@ -159,6 +169,7 @@ def main() -> None:
     save_to_csv(results, output_file)
 
     print("Hotovo.")
+
 
 if __name__ == "__main__":
     main()
